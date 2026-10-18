@@ -1,0 +1,62 @@
+name: Bump LaraPaper
+
+on:
+  schedule:
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Find the latest LaraPaper release
+        id: latest
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          latest=$(gh release view -R usetrmnl/larapaper --json tagName -q .tagName)
+          current=$(sed -nE 's#^FROM ghcr.io/usetrmnl/larapaper:(.*)$#\1#p' larapaper/Dockerfile)
+          echo "latest=$latest" >> "$GITHUB_OUTPUT"
+          echo "current=$current" >> "$GITHUB_OUTPUT"
+          echo "Current: $current, latest release: $latest"
+
+      - name: Check the image is published
+        if: steps.latest.outputs.latest != steps.latest.outputs.current
+        id: image
+        run: |
+          tag="${{ steps.latest.outputs.latest }}"
+          token=$(curl -fsS "https://ghcr.io/token?scope=repository:usetrmnl/larapaper:pull" | jq -r .token)
+          if curl -fsS -o /dev/null -H "Authorization: Bearer $token" \
+            -H "Accept: application/vnd.oci.image.index.v1+json" \
+            "https://ghcr.io/v2/usetrmnl/larapaper/manifests/$tag"; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Image $tag isn't on ghcr.io yet; trying again tomorrow."
+          fi
+
+      - name: Bump version
+        if: steps.image.outputs.ready == 'true'
+        env:
+          VERSION: ${{ steps.latest.outputs.latest }}
+        run: |
+          sed -i -E "s#^(FROM ghcr.io/usetrmnl/larapaper:).*#\1${VERSION}#" larapaper/Dockerfile
+          sed -i -E "s#^version: .*#version: \"${VERSION}\"#" larapaper/config.yaml
+          python3 - <<'EOF'
+          import os
+          version = os.environ["VERSION"]
+          path = "larapaper/CHANGELOG.md"
+          text = open(path).read()
+          entry = (f"## {version}\n\n- LaraPaper [{version}]"
+                   f"(https://github.com/usetrmnl/larapaper/releases/tag/{version})\n\n")
+          head, rest = text.split("\n\n", 1)
+          open(path, "w").write(f"{head}\n\n{entry}{rest}")
+          EOF
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "Bump LaraPaper to ${VERSION}"
+          git push
