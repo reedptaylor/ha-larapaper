@@ -2,7 +2,8 @@ name: Bump LaraPaper
 
 on:
   schedule:
-    - cron: "17 6 * * *"
+    - cron: "0 0 * * *"
+      timezone: America/Los_Angeles
   workflow_dispatch:
 
 permissions:
