@@ -1,4 +1,4 @@
-FROM ghcr.io/usetrmnl/larapaper:0.45.0
+FROM ghcr.io/usetrmnl/larapaper:0.45.1
 
 # Run as root so the startup script can own /config; serversideup's
 # 5-fpm-pool-user.sh then drops PHP-FPM workers back to www-data.
