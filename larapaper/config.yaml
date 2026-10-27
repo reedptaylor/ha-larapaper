@@ -1,6 +1,6 @@
 name: LaraPaper
 # Bumped by .github/workflows/bump-larapaper.yml; keep in sync with the Dockerfile's FROM tag.
-version: "0.45.1"
+version: "0.45.1.1"
 slug: larapaper
 description: Self-hosted TRMNL server (BYOS) built with Laravel
 url: https://github.com/usetrmnl/larapaper
@@ -16,6 +16,10 @@ ports:
 ports_description:
   8080/tcp: LaraPaper web UI and device API
 watchdog: tcp://[HOST]:[PORT:8080]
+# Sidebar panel, admins only by default. See app/HomeAssistant for the sub-path handling.
+ingress: true
+ingress_port: 8080
+panel_icon: mdi:tablet
 # Mounted at /config inside the app and included in Home Assistant backups.
 map:
   - type: app_config
@@ -27,9 +31,12 @@ environment:
   # Trust X-Forwarded-Proto from proxies on the Supervisor network (e.g. the Tailscale app),
   # so pages served over HTTPS keep https:// links.
   TRUSTED_PROXIES: 172.30.32.0/23
+  TRUSTED_PROXY: "off"
 options:
   app_url: http://localhost
 schema:
   app_url: url
   app_key: password?
   app_previous_keys: password?
+  ingress_login: email?
+  ingress_ha_user: str?

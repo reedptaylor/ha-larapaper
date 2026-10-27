@@ -10,6 +10,14 @@ on Home Assistant. The web UI and device API are on port **4567**.
 | `app_url` | Leave as `http://localhost`. LaraPaper then builds screen-image links from the address each request used, so devices and browsers can reach the server by different addresses. Any other value is used for every image link. |
 | `app_key` | Laravel encryption key, e.g. the output of `echo "base64:$(openssl rand -base64 32)"`. Leave empty to use the image's built-in key, which is public. |
 | `app_previous_keys` | Old keys, comma-separated, so data encrypted with them still decrypts after a key change. |
+| `ingress_login` | Email of a LaraPaper account to log into automatically from the sidebar panel. Leave empty to use LaraPaper's login page there. |
+| `ingress_ha_user` | Only auto-log-in this Home Assistant username (Settings → People → Users). Other users see the login page. Leave empty to auto-log-in anyone who can open the panel. |
+
+## Sidebar panel
+
+LaraPaper also appears in the Home Assistant sidebar (admins only). Without `ingress_login`,
+log in there as usual; tick **Remember me** to stay logged in. Logging out from the panel
+does nothing while auto-login is on.
 
 ## Data
 

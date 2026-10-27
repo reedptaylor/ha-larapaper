@@ -35,4 +35,8 @@ APP_PREVIOUS_KEYS_OPT="$(option app_previous_keys)"
 [ -n "$APP_KEY_OPT" ] && set_env APP_KEY "$APP_KEY_OPT"
 [ -n "$APP_PREVIOUS_KEYS_OPT" ] && set_env APP_PREVIOUS_KEYS "$APP_PREVIOUS_KEYS_OPT"
 
+# Always written, so clearing the option turns auto-login back off.
+set_env HA_INGRESS_LOGIN "$(option ingress_login)"
+set_env HA_INGRESS_HA_USER "$(option ingress_ha_user)"
+
 exit 0

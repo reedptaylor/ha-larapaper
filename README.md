@@ -13,8 +13,9 @@ A daily workflow checks for a new LaraPaper release and bumps the image tag and 
 Home Assistant then shows the update like any other app. Turn on auto-update on the app page
 to install it automatically.
 
-To change the wrapper itself without a new LaraPaper release, add a suffix to `version`
-in `larapaper/config.yaml` (e.g. `0.45.0-1`) so Home Assistant sees an update.
+To change the wrapper itself without a new LaraPaper release, add a fourth number to `version`
+in `larapaper/config.yaml` (e.g. `0.45.0.1`) so Home Assistant sees an update. Don't use a
+`-1` suffix: Home Assistant reads `0.45.0-1` as a pre-release, older than `0.45.0`.
 
 ## Adding the repository
 
