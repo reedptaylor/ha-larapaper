@@ -1,6 +1,6 @@
 name: LaraPaper
 # Bumped by .github/workflows/bump-larapaper.yml; keep in sync with the Dockerfile's FROM tag.
-version: "0.45.1.1"
+version: "0.45.1.2"
 slug: larapaper
 description: Self-hosted TRMNL server (BYOS) built with Laravel
 url: https://github.com/usetrmnl/larapaper

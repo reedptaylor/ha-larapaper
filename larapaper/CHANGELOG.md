@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.45.1.2
+
+- Fix the sidebar panel when Home Assistant is behind Cloudflare
+
 ## 0.45.1.1
 
 - Add a Home Assistant sidebar panel (ingress), with optional auto-login via `ingress_login`

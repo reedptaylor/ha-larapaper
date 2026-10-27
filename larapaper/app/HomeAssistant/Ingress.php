@@ -19,14 +19,12 @@ class Ingress
     /**
      * Whether the request came through ingress. Checks the socket address rather than $request->ip(),
      * which TRUSTED_PROXIES resolves to the browser's address from X-Forwarded-For. That relies on
-     * nginx's TRUSTED_PROXY=off (config.yaml); in "cloudflare" mode nginx would set REMOTE_ADDR from
-     * CF-Connecting-IP, which HA never sends, so a request carrying it is refused either way.
+     * nginx's TRUSTED_PROXY=off (config.yaml): its other modes rewrite REMOTE_ADDR from client headers.
+     * (Don't reject CF-Connecting-IP here: HA passes it through when it's behind Cloudflare.)
      */
     public static function from(Request $request): bool
     {
-        return $request->server('REMOTE_ADDR') === self::PROXY_IP
-            && $request->headers->has('X-Ingress-Path')
-            && ! $request->headers->has('CF-Connecting-IP');
+        return $request->server('REMOTE_ADDR') === self::PROXY_IP && $request->headers->has('X-Ingress-Path');
     }
 
     public function handle(Request $request, Closure $next): Response

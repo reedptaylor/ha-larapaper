@@ -26,7 +26,7 @@ INGRESS_IP=172.30.32.2
 failed=0
 
 cleanup() {
-    container rm -f ingress other app backstop >/dev/null 2>&1 || true
+    container rm -f ingress other app cfmode >/dev/null 2>&1 || true
     container network rm "$NET" >/dev/null 2>&1 || true
 }
 cleanup
@@ -90,8 +90,9 @@ check() { # description actual expected-glob
     fi
 }
 
+# As HA sends them when it's behind Cloudflare, which adds CF-Connecting-IP and HA passes it through.
 ingress_headers=(-H "X-Ingress-Path: $PREFIX" -H "X-Forwarded-Host: $HOST" -H "X-Forwarded-Proto: https"
-    -H "X-Forwarded-For: 192.168.1.50")
+    -H "X-Forwarded-For: 203.0.113.7, 172.30.32.1" -H "CF-Connecting-IP: 203.0.113.7")
 spoof_headers=(-H "X-Ingress-Path: $PREFIX" -H "X-Remote-User-Name: reed" -H "CF-Connecting-IP: $INGRESS_IP"
     -H "X-Forwarded-For: $INGRESS_IP")
 
@@ -106,13 +107,13 @@ fi
 probe other # stands in for the Tailscale app or any other app on the Supervisor network
 
 start app "$(app_env | sed -n 's/^TRUSTED_PROXY=//p')" -p "127.0.0.1:$PORT:8080"
-start backstop cloudflare # nginx trusting CF-Connecting-IP, to test Ingress.php's own check
+start cfmode cloudflare # the image's default nginx mode, to show the spoof checks can catch the hole
 APP=$(ip_of app)
-BACKSTOP=$(ip_of backstop)
+CFMODE=$(ip_of cfmode)
 wait_ready "$APP"
-wait_ready "$BACKSTOP"
+wait_ready "$CFMODE"
 add_user app
-add_user backstop
+add_user cfmode
 
 echo "Ingress, as the configured HA user"
 check "logged in automatically" \
@@ -135,8 +136,8 @@ check "from another app (e.g. Tailscale): not logged in, no prefix" \
 check "from the LAN via the published port: not logged in, no prefix" \
     "$(curl -sS -o /dev/null -w '%{http_code} %{redirect_url}' "${spoof_headers[@]}" "http://127.0.0.1:$PORT/dashboard")" \
     "302 http://127.0.0.1:$PORT/login"
-check "with nginx trusting CF-Connecting-IP: still refused" \
-    "$(request other "http://$BACKSTOP:8080/dashboard" "${spoof_headers[@]}")" "302 http://$BACKSTOP:8080/login"
+check "control: with nginx in \"cloudflare\" mode, the same spoof gets in" \
+    "$(request other "http://$CFMODE:8080/dashboard" "${spoof_headers[@]}")" "200 "
 
 echo "Direct access on the published port"
 check "login page has unprefixed links" \
