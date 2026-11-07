@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.46.0
+
+- LaraPaper [0.46.0](https://github.com/usetrmnl/larapaper/releases/tag/0.46.0)
+
 ## 0.45.1.2
 
 - Fix the sidebar panel when Home Assistant is behind Cloudflare
