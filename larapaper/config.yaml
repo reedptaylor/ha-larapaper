@@ -1,6 +1,6 @@
 name: LaraPaper
 # Bumped by .github/workflows/bump-larapaper.yml; keep in sync with the Dockerfile's FROM tag.
-version: "0.46.0"
+version: "0.46.0.1"
 slug: larapaper
 description: Self-hosted TRMNL server (BYOS) built with Laravel
 url: https://github.com/usetrmnl/larapaper
@@ -26,6 +26,8 @@ map:
     read_only: false
 environment:
   PHP_OPCACHE_ENABLE: "1"
+  # Log to stderr only
+  LOG_STACK: stderr
   TRMNL_PROXY_REFRESH_MINUTES: "15"
   DB_DATABASE: /config/database.sqlite
   # Trust X-Forwarded-Proto from proxies on the Supervisor network (e.g. the Tailscale app),

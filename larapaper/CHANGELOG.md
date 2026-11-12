@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.46.0.1
+
+- Log to stderr only, fixing 500s on device requests when laravel.log ends up owned by root
+
 ## 0.46.0
 
 - LaraPaper [0.46.0](https://github.com/usetrmnl/larapaper/releases/tag/0.46.0)
