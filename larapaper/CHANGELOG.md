@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.49.0
+
+- LaraPaper [0.49.0](https://github.com/usetrmnl/larapaper/releases/tag/0.49.0)
+
 ## 0.48.0
 
 - LaraPaper [0.48.0](https://github.com/usetrmnl/larapaper/releases/tag/0.48.0)
